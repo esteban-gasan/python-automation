@@ -13,7 +13,7 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)s %(message)s"
 )
 
-SLEEP_MIN = 30
+SLEEP_MIN = 30 # Scan every x minutes
 MB_LIMIT = 500
 FILE_SIZE_LIMIT = MB_LIMIT * 1000000
 
@@ -28,7 +28,7 @@ EXTENSION_FOLDERS = {
     'PDF': ['pdf'],
     'Videos': ['mp4', 'flv', 'mov', 'm4v', 'ts'],
     'Web': ['css', 'htm', 'html'],
-    'Zips': ['zip', 'gz', 'rar'],
+    'Zips': ['zip', 'gz', 'rar', 'tar', '7z'],
     'Other': [''],
 }
 
@@ -51,11 +51,13 @@ def main():
         for file in files:
             ext = file.suffix.strip('.').lower()
             folder = next(
-                (k for k, v in EXTENSION_FOLDERS.items() if ext in v), None)
+                (k for k, v in EXTENSION_FOLDERS.items() if ext in v), None
+            )
             if not folder:
                 logging.warning(f'Folder for ".{ext}" not found ({file.name})')
                 continue
 
+            # Don't move file if its size goes over the limit
             if (size := file.stat().st_size) > FILE_SIZE_LIMIT:
                 logging.info(
                     f'"{file.name}" size: {size // 1000000} > {MB_LIMIT} MB')
